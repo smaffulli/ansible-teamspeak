@@ -1,0 +1,108 @@
+#!/bin/bash
+### BEGIN INIT INFO 
+# Provides: ts3server
+# Required-Start: $network
+# Required-Stop: 
+# Default-Start: 3 5 
+# Default-Stop:
+# Description: Starts TeamSpeak 3 server
+### END INIT INFO
+
+#
+# About: This is an init.d-script for automated TeamSpeak 3 server startups after a physical system reboot
+#
+# Author: Sebastian Kraetzig
+#
+# Version: 1.0 <2013-11-10>
+#
+# License: GNU GPL v3
+#
+
+###################################################
+###						###
+###	S Y S T E M    I N F O R M A T I O N S	###
+###						###
+###################################################
+
+# Please enter the username, which should start your TeamSpeak 3 server
+# For example: USER=teamspeak
+# HINT: Do not use "root"! It is very unrecommend!
+USER=teamspeak
+
+# Please enter the root directory of your installed TeamSpeak 3 server
+# For example: ROOT_DIRECTORY=/home/teamspeak-server
+# HINT: Do NOT add the last slash to the path!
+ROOT_DIRECTORY=/home/teamspeak
+
+# Should the script delete the old TeamSpeak 3 server logs? Answer with "yes" or "no"!
+# For example: DELETE_LOGS=yes
+# HINT: Please write everything in lower case letters!
+DELETE_LOGS=yes
+
+
+###################################################
+###						###
+###		M A I N   P R O G R A M		###
+###						###
+###################################################
+
+# Install Runlevel-Script, if first parameter is "--install"
+if [[ "$1" == "--install" ]]; then
+	SCRIPT_PATH="$(pwd)/$(basename $0)"
+
+	# Set correct permissions
+	chmod 755 $SCRIPT_PATH
+	# Activate Script
+	insserv $SCRIPT_PATH
+
+	# Make it useable
+	cd /usr/sbin
+	ln -s $SCRIPT_PATH ts3server
+	cd - > /dev/zero
+fi
+
+echo -e "Please wait... Your TeamSpeak 3 server will be started...\n";
+
+if [ ! -d "$ROOT_DIRECTORY" ]; then
+	echo "ERROR! Your set directory '$ROOT_DIRECTORY' does not exist! Please make sure, that there are no typos in it! Script aborts...";
+	exit 1;
+fi
+
+# Change into root directory of TeamSpeak 3 server
+cd $ROOT_DIRECTORY
+
+# Delete PID file 'ts3server.pid', if exists
+if [[ -f ts3server.pid ]]; then
+	echo "Deleting ts3server.pid...";
+	rm ts3server.pid
+fi
+
+# Delete old logs, if the user enabled it
+if [[ "$DELETE_LOGS" == "yes" ]]; then
+	echo "Deleting logs...";
+	rm -rf logs/*.log
+fi
+
+# Start TeamSpeak 3 server as set user
+su $USER -c "./ts3server_startscript.sh start"
+
+# Check, if the './ts3server_startscript.sh start' command was successfull
+if [[ $? -eq 0 ]]; then
+	echo -e "\nScript is checking TeamSpeak 3 server status...\n";
+	# Sleep for a few seconds...
+	sleep 5s
+
+	# Check, if TeamSpeak 3 server is still runing
+	TS_SERVER_STATUS=$(su $USER -c "./ts3server_startscript.sh status")
+
+	if [[ "$TS_SERVER_STATUS" == "Server is running" ]]; then
+		echo -e "Your server was started successfull!\n";
+	else
+		echo -e "Your server could NOT be started!\n";
+	fi
+fi
+
+# Go back to old directory
+cd - > /dev/zero
+
+exit 0;
