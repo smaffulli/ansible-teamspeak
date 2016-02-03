@@ -79,4 +79,4 @@ Author Information
 
 This role was created by [Stefano Maffulli](http://maffulli.net).
 Latest versions, bug reports and pull requests on
-[Github](https://github.com/smaffulli).
+[Github](https://github.com/smaffulli/ansible-teamspeak).
