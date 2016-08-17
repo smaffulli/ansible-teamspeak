@@ -1,7 +1,7 @@
 ---
 # handlers file for ansible-teamspeak/
 - name: update teamspeak initscripts
-  command: update-rc.d teamspeak-server
+  command: update-rc.d teamspeak defaults
 
 - name: restart teamspeak
-  service: name=teamspeak-server state=restarted
+  service: name=teamspeak state=restarted
