@@ -7,7 +7,6 @@
 
     - name: Download ts3 from mirror
       get_url: url="http://dl.4players.de/ts/releases/{{ teamspeak_version }}/teamspeak3-server_linux_amd64-{{ teamspeak_version }}.tar.bz2" dest=/home/teamspeak/teamspeak-server-{{ teamspeak_version }}.tar.bz2
-      become_user: teamspeak
 
     - name: Create Teamspeak directory
       file: name=/home/teamspeak/teamspeak-server-{{ teamspeak_version }} state=directory owner=teamspeak group=users
@@ -15,8 +14,6 @@
 
     - name: Extract Teamspeak archive
       unarchive: copy=no src=/home/teamspeak/teamspeak-server-{{ teamspeak_version }}.tar.bz2 dest=/home/teamspeak/teamspeak-server-{{ teamspeak_version }}/  creates=/home/teamspeak/teamspeak-server-{{ teamspeak_version }}/teamspeak3-server_linux_amd64/ts3server_startscript.sh
-      become: yes
-      become_user: teamspeak
 
     - name: Add Teamspeak initscript
       template: src=teamspeak.j2 dest=/etc/init.d/teamspeak owner=root group=root mode=0744
