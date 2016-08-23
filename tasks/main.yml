@@ -6,35 +6,21 @@
       become: yes
 
     - name: Download ts3 from mirror
-      get_url: url="http://dl.4players.de/ts/releases/{{ teamspeak_version }}/teamspeak3-server_linux_x86-{{ teamspeak_version }}.tar.bz2" dest=/home/teamspeak/teamspeak-server-{{ teamspeak_version }}.tar.bz2
-      become_user: teamspeak
+      get_url: url="http://dl.4players.de/ts/releases/{{ teamspeak_version }}/teamspeak3-server_linux_amd64-{{ teamspeak_version }}.tar.bz2" dest=/home/teamspeak/teamspeak-server-{{ teamspeak_version }}.tar.bz2
 
     - name: Create Teamspeak directory
       file: name=/home/teamspeak/teamspeak-server-{{ teamspeak_version }} state=directory owner=teamspeak group=users
       become: yes
 
     - name: Extract Teamspeak archive
-      unarchive: copy=no src=/home/teamspeak/teamspeak-server-{{ teamspeak_version }}.tar.bz2 dest=/home/teamspeak/teamspeak-server-{{ teamspeak_version }}/  creates=/home/teamspeak/teamspeak-server-{{ teamspeak_version }}/teamspeak3-server_linux
-      become: yes
-      become_user: teamspeak
-      register: teamspeak_updated
+      unarchive: copy=no src=/home/teamspeak/teamspeak-server-{{ teamspeak_version }}.tar.bz2 dest=/home/teamspeak/teamspeak-server-{{ teamspeak_version }}/  creates=/home/teamspeak/teamspeak-server-{{ teamspeak_version }}/teamspeak3-server_linux_amd64/ts3server_startscript.sh
 
     - name: Add Teamspeak initscript
-      template: src=teamspeak dest=/etc/init.d/teamspeak owner=root group=root mode=0744
+      template: src=teamspeak.j2 dest=/etc/init.d/teamspeak owner=root group=root mode=0744
       become: yes
       notify:
-        - restart teamspeak
-      register: teamspeak_initscript_modified
-
-    - name: Stop teamspeak
-      service: name=teamspeak3 state=stopped
-      become: yes
-      when: teamspeak_initscript_modified|changed
-
-    - name: Update initscipt to run on default init levels
-      command: update-rc.d teamspeak defaults
-      become: yes
-      when: teamspeak_initscript_modified|changed
+      - restart teamspeak
+      - update teamspeak initscripts
 
     - name: Enable Teamspeak
       service: name="teamspeak" state=started enabled=yes

@@ -1,6 +1,6 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:             teamspeak-server
+# Provides:             teamspeak
 # Required-Start:       $network $local_fs $remote_fs $syslog
 # Required-Stop:        $network #local_fs $remote_fs $syslog
 # Default-Start:        2 3 4 5
@@ -14,7 +14,7 @@
 g_COMMAND="$1"
 
 g_USER="teamspeak"
-g_TS3_HOME="/home/teamspeak/teamspeak-server-{{ teamspeak_version }}/teamspeak3-server_linux_x86"
+g_TS3_HOME="/home/teamspeak/teamspeak-server-{{ teamspeak_version }}/teamspeak3-server_linux_amd64"
 g_STARTSCRIPT="$g_TS3_HOME/ts3server_startscript.sh"
 
 cd "$g_TS3_HOME"
